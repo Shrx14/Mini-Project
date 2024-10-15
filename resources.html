@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Resources</title>
+</head>
+<body>
+    <header>
+        <h1>Resources</h1>
+    </header>
+    <main>
+        <p>View and manage resources available at the rehab center.</p>
+        <table id="resourcesTable" border="1">
+            <thead>
+                <tr>
+                    <th>Resource ID</th>
+                    <th>Resource Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Resource data will be populated here -->
+            </tbody>
+        </table>
+    </main>
+    <footer>
+        <p>&copy; Paraplegic Rehab Center</p>
+    </footer>
+
+    <script>
+        // Function to fetch and display resources
+        function fetchResources() {
+            fetch('http://localhost:3000/api/resources')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.getElementById('resourcesTable').querySelector('tbody');
+                        tbody.innerHTML = ''; // Clear existing data
+
+                        data.data.forEach(resource => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${resource.ResourceID}</td>
+                                <td>${resource.ResourceName}</td>
+                                <td>${resource.Description}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    } else {
+                        console.error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching resources:', error);
+                });
+        }
+
+        // Call the fetchResources function when the page loads
+        document.addEventListener('DOMContentLoaded', fetchResources);
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Treatment Plans</title>
+</head>
+<body>
+    <header>
+        <h1>Treatment Plans</h1>
+    </header>
+    <main>
+        <p>View and manage treatment plans here.</p>
+        <div id="treatmentPlansContainer"></div> <!-- Container to display treatment plans -->
+        <div id="message" style="color: red;" aria-live="polite"></div> <!-- Message for errors -->
+    </main>
+    <footer>
+        <p>&copy; Paraplegic Rehab Center</p>
+    </footer>
+
+    <script>
+        // Function to fetch treatment plans
+        function fetchTreatmentPlans() {
+            fetch('/api/treatment-plans') // Adjust this endpoint as necessary
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Check if the request was successful
+                    if (data.success) {
+                        displayTreatmentPlans(data.data);
+                    } else {
+                        document.getElementById('message').innerText = data.message; // Show error message
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching treatment plans:', error);
+                    document.getElementById('message').innerText = "Failed to load treatment plans.";
+                });
+        }
+
+        // Function to display treatment plans
+        function displayTreatmentPlans(plans) {
+            const container = document.getElementById('treatmentPlansContainer');
+            container.innerHTML = ''; // Clear previous content
+
+            if (plans.length === 0) {
+                container.innerHTML = '<p>No treatment plans available.</p>';
+                return;
+            }
+
+            plans.forEach(plan => {
+                const planDiv = document.createElement('div');
+                planDiv.classList.add('treatment-plan');
+                planDiv.innerHTML = `
+                    <h2>Plan ID: ${plan.PlanID}</h2>
+                    <p><strong>Goals:</strong> ${plan.Goals}</p>
+                    <p><strong>Plan Details:</strong> ${plan.PlanDetails}</p>
+                    <p><strong>Start Date:</strong> ${new Date(plan.StartDate).toLocaleDateString()}</p>
+                    <p><strong>End Date:</strong> ${new Date(plan.EndDate).toLocaleDateString()}</p>
+                    <p><strong>Progress Report:</strong> ${plan.ProgressReport}</p>
+                `;
+                container.appendChild(planDiv);
+            });
+        }
+
+        // Fetch treatment plans on page load
+        window.onload = fetchTreatmentPlans;
+    </script>
+</body>
+</html>

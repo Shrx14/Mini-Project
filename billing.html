@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Billing</title>
+</head>
+<body>
+    <header>
+        <h1>Billing Information</h1>
+    </header>
+    <main>
+        <p>Manage billing information here.</p>
+        <table id="billingTable" border="1">
+            <thead>
+                <tr>
+                    <th>Billing ID</th>
+                    <th>Amount</th>
+                    <th>Billing Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Billing data will be populated here -->
+            </tbody>
+        </table>
+    </main>
+    <footer>
+        <p>&copy; Paraplegic Rehab Center</p>
+    </footer>
+
+    <script>
+        // Function to fetch and display billing information
+        function fetchBillingInformation() {
+            fetch('http://localhost:3000/api/billing') // API endpoint for billing information
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.getElementById('billingTable').querySelector('tbody');
+                        tbody.innerHTML = ''; // Clear existing data
+
+                        // Populate the table with billing data
+                        data.data.forEach(billing => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${billing.BillingID}</td>
+                                <td>${billing.Amount}</td>
+                                <td>${new Date(billing.BillingDate).toLocaleDateString()}</td>
+                                <td>${billing.Status}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    } else {
+                        console.error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching billing information:', error);
+                });
+        }
+
+        // Fetch billing information when the page loads
+        fetchBillingInformation();
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Therapy Sessions</title>
+</head>
+<body>
+    <header>
+        <h1>Therapy Sessions</h1>
+    </header>
+    <main>
+        <p>Log therapy sessions here.</p>
+        <table id="therapyTable" border="1">
+            <thead>
+                <tr>
+                    <th>Session ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Therapist</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Therapy session data will be populated here -->
+            </tbody>
+        </table>
+    </main>
+    <footer>
+        <p>&copy; Paraplegic Rehab Center</p>
+    </footer>
+
+    <script>
+        // Function to fetch and display therapy session information
+        function fetchTherapySessions() {
+            fetch('/api/therapy-sessions') // Ensure this endpoint is defined in your app.js
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.getElementById('therapyTable').querySelector('tbody');
+                        tbody.innerHTML = ''; // Clear existing data
+
+                        data.data.forEach(session => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${session.SessionID}</td>
+                                <td>${new Date(session.SessionDate).toLocaleDateString()}</td>
+                                <td>${new Date(session.SessionTime).toLocaleTimeString()}</td>
+                                <td>${session.Therapist}</td>
+                                <td>${session.Notes}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    } else {
+                        console.error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching therapy sessions:', error);
+                });
+        }
+
+        // Automatically fetch therapy sessions when the page loads
+        fetchTherapySessions();
+    </script>
+</body>
+</html>

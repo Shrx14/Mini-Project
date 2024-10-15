@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Patient Reports</title>
+</head>
+<body>
+    <header>
+        <h1>Patient Reports</h1>
+    </header>
+    <main>
+        <p>View patient reports and notes from therapists and doctors.</p>
+        <table id="reportsTable" border="1">
+            <thead>
+                <tr>
+                    <th>Report ID</th>
+                    <th>Report Date</th>
+                    <th>Therapist Notes</th>
+                    <th>Doctor Notes</th>
+                    <th>Progress Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Patient reports will be populated here -->
+            </tbody>
+        </table>
+    </main>
+    <footer>
+        <p>&copy; Paraplegic Rehab Center</p>
+    </footer>
+
+    <script>
+        // Function to fetch and display patient reports
+        function fetchPatientReports(patientId) {
+            fetch(`http://localhost:3000/api/reports/${patientId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.getElementById('reportsTable').querySelector('tbody');
+                        tbody.innerHTML = ''; // Clear existing data
+
+                        data.data.forEach(report => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${report.ReportID}</td>
+                                <td>${new Date(report.ReportDate).toLocaleDateString()}</td>
+                                <td>${report.TherapistNotes || 'N/A'}</td>
+                                <td>${report.DoctorNotes || 'N/A'}</td>
+                                <td>${report.ProgressDetails || 'N/A'}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    } else {
+                        console.error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching patient reports:', error);
+                });
+        }
+
+        // Get the patient ID from session storage
+        const patientId = sessionStorage.getItem('patientId'); // Retrieve the patient ID
+        if (patientId) {
+            fetchPatientReports(patientId); // Fetch reports for the logged-in patient
+        } else {
+            console.error('No patient ID found in session storage.');
+            document.querySelector('main').innerHTML += '<p>Error: Patient ID not found. Please log in again.</p>';
+        }
+    </script>
+</body>
+</html>

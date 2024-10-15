@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">  <!-- Main CSS file -->
+    <title>Patient Registration</title>
+</head>
+<body>
+    <center>
+        <div class="container">
+            <table border="0" style="width: 69%;">
+                <tr>
+                    <td colspan="2">
+                        <p class="header-text">Patient Registration</p>
+                        <p class="sub-text">Please fill in your details to create your account.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <form id="signupForm" method="POST" onsubmit="handleSignup(event)">
+                        <td class="label-td" colspan="2">
+                            <label for="username" class="form-label">Username: </label>
+                        </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <input type="text" name="username" class="input-text" placeholder="Enter your username" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <label for="email" class="form-label">Email: </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <input type="email" name="email" class="input-text" placeholder="Email Address" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <label for="tele" class="form-label">Phone: </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <input type="tel" name="tele" class="input-text" placeholder="Enter your phone number" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <label for="password" class="form-label">Password: </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <input type="password" name="password" class="input-text" placeholder="Create a password" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <label for="cpassword" class="form-label">Confirm Password: </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <input type="password" name="cpassword" class="input-text" placeholder="Confirm your password" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button type="submit" class="submit-button">Register</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" id="message" style="color: red;"></td> <!-- Message for errors -->
+                </tr>
+                    </form>
+                </tr>
+            </table>
+        </div>
+    </center>
+
+    <!-- Add your script here -->
+    <script>
+        function handleSignup(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+            const username = form.username.value;
+            const email = form.email.value;
+            const tele = form.tele.value;
+            const password = form.password.value;
+            const cpassword = form.cpassword.value;
+
+            // Basic validation
+            if (password !== cpassword) {
+                document.getElementById('message').innerText = "Passwords do not match.";
+                return;
+            }
+
+            // Send the data to the backend
+            fetch('http://localhost:3000/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, tele, password }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message); // Show success message
+                window.location.href = 'PatientLogin.html'; // Redirect to login page
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('message').innerText = "Registration failed.";
+            });
+        }
+    </script>
+</body>
+</html>

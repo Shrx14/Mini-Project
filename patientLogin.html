@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Patient Login</title>
+</head>
+<body>
+    <header>
+        <h1>Patient Login</h1>
+    </header>
+    <main>
+        <form id="loginForm" method="POST" onsubmit="handleLogin(event)">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <input type="submit" value="Login" id="loginButton">
+        </form>
+        <div id="message" style="color: red;" aria-live="polite"></div> <!-- Message for login errors -->
+    </main>
+    <footer>
+        <p>&copy; Paraplegic Rehab Center</p>
+    </footer>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+            const username = form.username.value;
+            const password = form.password.value;
+
+            // Disable the login button
+            document.getElementById('loginButton').disabled = true;
+
+            // Send the login data to the backend
+            fetch('/api/login', { // Use relative URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Enable the login button again
+                document.getElementById('loginButton').disabled = false;
+
+                if (data.success) {
+                    alert('Login successful!'); // Show success message
+                    window.location.href = 'dashboard.html'; // Redirect to dashboard page
+                } else {
+                    document.getElementById('message').innerText = data.message; // Show error message
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('message').innerText = "Login failed.";
+                document.getElementById('loginButton').disabled = false; // Enable the login button again on error
+            });
+        }
+    </script>
+</body>
+</html>
